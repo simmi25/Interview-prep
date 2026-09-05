@@ -6,9 +6,11 @@
 ## Section 1: Core Ansible Concepts (Q1–Q20)
 
 **Q1. What is Ansible, and how does it differ from other configuration management tools like Puppet or Chef?**
+
 Ansible is an agentless, push-based automation tool that uses SSH (or WinRM for Windows) to configure systems, unlike Puppet/Chef which need agents installed on managed nodes and typically pull configuration from a master server. Ansible uses YAML for playbooks (declarative, human-readable), has a much lower learning curve, and doesn't require a persistent daemon on target hosts, making it lighter to operate at scale.
 
 **Q2. Explain idempotency in Ansible and why it matters.**
+
 Idempotency means running the same playbook multiple times produces the same end state without unintended side effects — a task that has already achieved its desired state reports "ok" instead of "changed." This is critical for safe re-runs, drift correction, and CI/CD pipelines where playbooks may execute repeatedly against the same hosts.
 
 **Q3. What is the difference between Ansible and Ansible Automation Platform (AAP)?**
