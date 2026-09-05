@@ -14,57 +14,76 @@ Ansible is an agentless, push-based automation tool that uses SSH (or WinRM for 
 Idempotency means running the same playbook multiple times produces the same end state without unintended side effects — a task that has already achieved its desired state reports "ok" instead of "changed." This is critical for safe re-runs, drift correction, and CI/CD pipelines where playbooks may execute repeatedly against the same hosts.
 
 **Q3. What is the difference between Ansible and Ansible Automation Platform (AAP)?**
+
 Ansible (Ansible Core / Community) is the open-source CLI engine that runs playbooks. AAP is Red Hat's enterprise product built around that engine, adding a web UI/API (Automation Controller), RBAC, scheduling, credential management, execution environments, Automation Hub for certified content, Automation Mesh for scaling, and Event-Driven Ansible — essentially turning ad-hoc automation into a governed, auditable platform.
 
 **Q4. What are the main components of Ansible architecture?**
+
 Control node (where Ansible is installed and playbooks run from), managed nodes (targets), inventory (list of managed nodes), modules (units of work), plugins (extend behavior — connection, callback, lookup, filter), and playbooks (YAML files defining automation).
 
 **Q5. How does Ansible connect to managed nodes?**
+
 By default over SSH for Linux/Unix (using paramiko or the faster OpenSSH-based connection plugin) and over WinRM for Windows hosts. Connection type is configurable via the `ansible_connection` variable, and `local` or `docker` connections are also supported for special cases.
 
 **Q6. What is a playbook?**
+
 A YAML file that defines an ordered set of plays, each mapping a group of hosts to a set of tasks (or roles) to be executed, along with variables, handlers, and other configuration such as become/privilege escalation settings.
 
 **Q7. Difference between a task, a play, and a playbook?**
+
 A task is a single unit of work calling one module. A play is a collection of tasks mapped to a specific set of hosts with a defined execution context. A playbook is a file (or set of files) containing one or more plays, executed in order.
 
 **Q8. What is a module in Ansible? Give examples.**
+
 A module is a discrete, reusable script that performs a specific action on the managed node — e.g., `yum`/`dnf` for package management, `copy`/`template` for file management, `service`/`systemd` for service control, `user` for account management, and `command`/`shell` for arbitrary commands.
 
+
 **Q9. What's the difference between `command`, `shell`, and `raw` modules?**
+
 `command` runs a command without shell processing (no pipes, redirects, or env variable expansion), which is safer. `shell` runs the command through `/bin/sh`, so shell features like pipes and redirection work. `raw` bypasses the module subsystem entirely and is used mainly for bootstrapping hosts that don't yet have Python installed.
 
 **Q10. What is `gather_facts`, and what are Ansible facts?**
+
 Facts are system properties (OS, IP addresses, memory, CPU, mounted filesystems, etc.) automatically collected from managed nodes via the `setup` module at the start of a play unless `gather_facts: false` is set. They're accessible as variables (e.g., `ansible_facts['os_family']`) and used for conditional logic.
 
 **Q11. How do you disable fact gathering, and why would you?**
+
 Set `gather_facts: no` at the play level. You'd disable it to speed up execution when facts aren't needed (e.g., simple file-copy playbooks against many hosts), reducing per-run overhead significantly at scale.
 
 **Q12. What is `ansible.cfg`, and what's the precedence order for configuration?**
+
 `ansible.cfg` is the main configuration file controlling defaults (inventory path, remote user, privilege escalation, SSH args, etc.). Precedence (highest to lowest): environment variables → `ansible.cfg` in the current directory → `~/.ansible.cfg` → `/etc/ansible/ansible.cfg`.
 
 **Q13. Explain `become`, `become_user`, and `become_method`.**
+
 `become` enables privilege escalation (e.g., to root), `become_user` specifies the target user (defaults to root), and `become_method` specifies the mechanism — commonly `sudo`, but also `su`, `pbrun`, `doas`, etc.
 
 **Q14. What is check mode (`--check`) and diff mode (`--diff`)?**
+
 Check mode ("dry run") simulates a playbook run and reports what *would* change without making actual changes (not all modules support it fully). Diff mode shows before/after differences for changed files/templates, and the two are commonly combined (`--check --diff`) to validate changes before applying them in production.
 
 **Q15. What are handlers, and when do they run?**
+
 Handlers are tasks triggered via `notify` from another task, and they run only when notified, at the end of the play (or when explicitly flushed with `meta: flush_handlers`), and only once even if notified multiple times — commonly used for service restarts after a config change.
 
 **Q16. What is the difference between `notify` and directly calling a task?**
+
 `notify` defers execution of the handler to the end of the play and de-duplicates multiple notifications, whereas calling a task directly executes it immediately, every time, in sequence — handlers are for "only restart if something actually changed."
 
 **Q17. Explain serial, strategy, and forks.**
+
 `serial` controls how many hosts are processed in a batch before moving to the next batch (useful for rolling updates). `strategy` controls execution flow across hosts — `linear` (default, all hosts complete a task before moving to the next) vs `free` (hosts proceed independently at their own pace). `forks` controls the number of parallel processes Ansible spawns to talk to hosts simultaneously (default 5, commonly tuned up for large estates).
 
 **Q18. What is `delegate_to` and when would you use it?**
+
 `delegate_to` runs a task on a different host than the one the play targets — e.g., updating a load balancer or registering with a monitoring server on behalf of the host being deployed, or running local actions with `delegate_to: localhost`.
 
 **Q19. What's the difference between `run_once` and `delegate_to`?**
+
 `run_once: true` ensures a task executes on only one host in the batch (useful for tasks like DB migrations that shouldn't run per-node), whereas `delegate_to` changes *which host* executes the task; they're often combined, e.g., `run_once: true` with `delegate_to: localhost`.
 
 **Q20. How do you handle errors in Ansible playbooks?**
+
 Using `ignore_errors: true` to continue past a failing task, `failed_when`/`changed_when` to customize what counts as failure/change, `block/rescue/always` for try-catch-finally style error handling, and `any_errors_fatal` or `max_fail_percentage` to control failure thresholds across hosts.
 
 ---
@@ -72,6 +91,7 @@ Using `ignore_errors: true` to continue past a failing task, `failed_when`/`chan
 ## Section 2: Playbooks, Roles & Templating (Q21–Q35)
 
 **Q21. What is a role in Ansible, and what is its directory structure?**
+
 A role is a reusable, self-contained unit of automation with a standardized structure: `tasks/`, `handlers/`, `templates/`, `files/`, `vars/`, `defaults/`, `meta/`, and `tests/`. Roles make playbooks modular, shareable (via Galaxy/Hub), and easier to maintain across projects.
 
 **Q22. Difference between `vars` and `defaults` in a role?**
