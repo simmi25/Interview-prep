@@ -6,33 +6,44 @@
 ## Section 1: Fundamentals & IaC Concepts (Q1–Q10)
 
 **Q1. What is Terraform, and what problem does it solve?**
+
 Terraform is an open-source Infrastructure as Code (IaC) tool by HashiCorp that lets you define cloud/on-prem infrastructure declaratively in configuration files (HCL) and then provisions/manages it consistently and repeatably — solving the problem of manual, error-prone, undocumented infrastructure changes by making infrastructure changes version-controlled, reviewable, and reproducible.
 
 **Q2. What is the difference between declarative and imperative infrastructure provisioning?**
-Declarative (Terraform's approach) means you describe the *desired end state* and the tool figures out how to get there. Imperative (e.g., a shell script calling `aws ec2 run-instances`) means you specify the exact *sequence of steps* to perform — declarative tools handle ordering, dependency resolution, and diffing automatically, which is why Terraform can tell you exactly what will change before applying it.
+
+Declarative (Terraform's approach) means you describe the *desired end state* and the tool figures out how to get there. 
+Imperative (e.g., a shell script calling `aws ec2 run-instances`) means you specify the exact *sequence of steps* to perform — declarative tools handle ordering, dependency resolution, and diffing automatically, which is why Terraform can tell you exactly what will change before applying it.
 
 **Q3. What is the difference between Terraform and Ansible/Chef/Puppet?**
+
 Terraform is primarily an *infrastructure provisioning* tool (creating VMs, networks, load balancers, managed databases) working at the API/resource level. Ansible/Chef/Puppet are primarily *configuration management* tools (installing packages, managing files, configuring services) working *inside* already-provisioned machines. In practice, they're often used together: Terraform provisions the infrastructure, then Ansible configures it.
 
 **Q4. What is the typical Terraform workflow (the core commands)?**
+
 `terraform init` (initialize working directory, download providers/modules), `terraform plan` (preview changes), `terraform apply` (execute changes), and `terraform destroy` (tear down managed infrastructure) — this init → plan → apply cycle is the backbone of nearly every Terraform operation.
 
 **Q5. What does `terraform init` actually do?**
+
 It downloads and installs the required provider plugins (per `required_providers` blocks), initializes the backend (where state will be stored), downloads any referenced modules, and sets up the `.terraform` working directory — it must be re-run whenever providers, backend config, or modules change.
 
 **Q6. What is the difference between `terraform plan` and `terraform apply`?**
+
 `terraform plan` computes and displays an execution plan — what resources will be created, changed, or destroyed — without making any actual changes, letting you review before committing. `terraform apply` executes that plan against real infrastructure (and by default re-computes the plan itself unless you pass a previously saved plan file).
 
 **Q7. How do you save a plan and apply exactly that plan later (rather than re-computing at apply time)?**
+
 `terraform plan -out=tfplan` saves the plan to a file, then `terraform apply tfplan` applies precisely that saved plan — ensuring what gets approved in a review/CI gate is exactly what gets executed, with no risk of drift between the reviewed plan and the applied changes.
 
 **Q8. What is HCL, and is Terraform configuration allowed in JSON instead?**
+
 HCL (HashiCorp Configuration Language) is Terraform's native, human-friendly configuration syntax. Terraform also accepts an equivalent JSON representation (`.tf.json` files), primarily intended for machine-generated configuration rather than hand-authoring, since HCL is far more readable for humans.
 
 **Q9. What file extensions does Terraform use, and does file naming matter?**
+
 `.tf` for configuration files and `.tfvars`/`.tfvars.json` for variable definition files. Within a directory, Terraform loads and merges *all* `.tf` files together regardless of name (there's no strict naming requirement), though conventions like `main.tf`, `variables.tf`, `outputs.tf`, and `providers.tf` are widely followed for readability.
 
 **Q10. What is idempotency in the context of Terraform, and how does it achieve it?**
+
 Idempotency means running `terraform apply` repeatedly against unchanged configuration produces no further changes. Terraform achieves this by comparing the desired configuration against its recorded state (and the real infrastructure) each run, only acting on the *diff* — if nothing has changed, the plan shows zero actions.
 
 ---
