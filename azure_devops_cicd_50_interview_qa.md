@@ -6,27 +6,35 @@
 ## Section 1: Azure DevOps Fundamentals (Q1–Q8)
 
 **Q1. What is Azure DevOps, and what are its core services?**
+
 Azure DevOps is Microsoft's suite of DevOps tools covering the full software delivery lifecycle: Azure Boards (work item tracking/Agile planning), Azure Repos (Git/TFVC source control), Azure Pipelines (CI/CD build and release automation), Azure Test Plans (manual/exploratory testing), and Azure Artifacts (package management for NuGet/npm/Maven/Python feeds).
 
 **Q2. What is the difference between Azure DevOps Services and Azure DevOps Server?**
+
 Azure DevOps Services is the Microsoft-hosted, cloud/SaaS version (formerly VSTS/Visual Studio Online). Azure DevOps Server is the on-premises, self-hosted version (formerly Team Foundation Server/TFS) that organizations install and manage on their own infrastructure — functionally similar but with different update cadences and hosting responsibilities.
 
 **Q3. What is a Project in Azure DevOps, and what is an Organization?**
+
 An Organization is the top-level container (tied to a specific Azure AD tenant/billing) holding one or more Projects. A Project is a workspace within that organization containing its own Boards, Repos, Pipelines, and Artifacts feeds — used to logically separate different products/teams within the same organization.
 
 **Q4. What is the difference between CI (Continuous Integration) and CD (Continuous Delivery/Deployment)?**
+
 CI is the practice of automatically building and testing code every time changes are pushed, catching integration issues early. Continuous Delivery automates the release process up to a manual approval gate before production. Continuous Deployment goes further, automatically deploying every passing change all the way to production with no manual gate — the distinction between the latter two is entirely about whether a human approval step exists before the final production release.
 
 **Q5. What is the difference between a Build pipeline and a Release pipeline in Azure DevOps' classic model?**
+
 A Build pipeline compiles/tests code and produces artifacts (the CI side). A Release pipeline takes those artifacts and deploys them through a sequence of stages/environments (the CD side) — this was the original two-pipeline classic UI model; modern YAML pipelines can express both build and multi-stage deployment in a single pipeline definition instead.
 
 **Q6. What is the difference between classic (UI-based) pipelines and YAML pipelines in Azure Pipelines?**
+
 Classic pipelines are configured through a visual designer UI, with definitions stored in Azure DevOps' database (not natively version-controlled alongside code). YAML pipelines are defined in a `.yml` file checked into the same repository as the code, giving version history, code review via PRs, and "pipeline as code" — YAML is now Microsoft's recommended approach for new pipelines.
 
 **Q7. What is a Service Connection in Azure DevOps, and why is it needed?**
+
 A Service Connection stores the authentication details (service principal, personal access token, SSH key, etc.) needed for a pipeline to securely connect to an external service — Azure subscriptions, Docker registries, Kubernetes clusters, GitHub, or on-prem servers — without embedding credentials directly in pipeline YAML.
 
 **Q8. What is the difference between a Personal Access Token (PAT) and a Service Principal for authenticating pipelines to Azure resources?**
+
 A PAT is tied to an individual user account, inherits that user's permissions, and expires/needs manual renewal — risky for automation since it's linked to a person who might leave or have it revoked. A Service Principal is an Azure AD identity created specifically for an application/automation to use, with its own scoped permissions independent of any individual user, and is the recommended approach for pipeline-to-Azure authentication (often used via a Service Connection with Managed Identity or federated credentials as the most secure current option).
 
 ---
@@ -34,6 +42,7 @@ A PAT is tied to an individual user account, inherits that user's permissions, a
 ## Section 2: Azure Pipelines — YAML & Structure (Q9–Q18)
 
 **Q9. What is the basic structure/hierarchy of a YAML pipeline (stages, jobs, steps)?**
+
 A Pipeline contains one or more Stages (logical phases, e.g., Build, Test, Deploy), each Stage contains one or more Jobs (units of work that run on an agent), and each Job contains a sequence of Steps (individual tasks or scripts) — this hierarchy lets you control grouping, dependencies, and parallelism at the appropriate level.
 
 **Q10. What is the difference between a `task` and a `script` step in a YAML pipeline?**
